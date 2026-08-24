@@ -1,0 +1,20 @@
+[project]
+name = "prefill-decode-roofline"
+version = "0.1.0"
+description = "The physics before the engines: measured arithmetic intensity, prefill compute-bound vs decode memory-bandwidth-bound, with the roofline plot."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
