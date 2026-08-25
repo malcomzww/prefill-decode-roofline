@@ -233,9 +233,22 @@ def write_invariants(
     add("not. Batching is the main lever on decode efficiency and it is a real")
     add("one, but it moves the point *along* the bandwidth roof rather than")
     add("across the ridge:\n")
-    assert roof.bound_by(b32) == "memory"
-    add(f"- batch 1 at S={HEADLINE_SEQ}: {b1:.2f} FLOP/byte, memory-bound")
-    add(f"- batch 32 at S={HEADLINE_SEQ}: {b32:.2f} FLOP/byte, still memory-bound\n")
+    # Batch 1 is memory-bound on any real memory system -- an intensity of
+    # 1.0 FLOP/byte is below every published ridge point, so this is safe to
+    # assert and safe to commit.
+    assert roof.bound_by(b1) == "memory", (
+        f"batch-1 decode at {b1:.2f} FLOP/byte was not memory-bound; "
+        "that would mean a ridge point below 1.0, which no memory system has"
+    )
+    add(f"- batch 1 at S={HEADLINE_SEQ}: {b1:.2f} FLOP/byte, memory-bound on")
+    add("  any real memory system")
+    add(f"- batch 32 at S={HEADLINE_SEQ}: {b32:.2f} FLOP/byte, still far below")
+    add("  the ridge point of every accelerator in the table above\n")
+    add("Whether batch-32 decode crosses a *particular* machine's ridge is")
+    add("machine-dependent and deliberately not asserted here: on a host with")
+    add("weak GEMM throughput the ridge can fall below this intensity, which")
+    add("says more about that host's compute roof than about decode. The CI")
+    add("runner is exactly such a host, which is how this was found.\n")
     add("The gain is larger at short context, where weight traffic dominates,")
     add("and shrinks as the cache grows. That is the tradeoff continuous")
     add("batching actually makes.\n")

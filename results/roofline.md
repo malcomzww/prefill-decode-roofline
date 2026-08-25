@@ -97,8 +97,16 @@ not. Batching is the main lever on decode efficiency and it is a real
 one, but it moves the point *along* the bandwidth roof rather than
 across the ridge:
 
-- batch 1 at S=1024: 1.00 FLOP/byte, memory-bound
-- batch 32 at S=1024: 4.82 FLOP/byte, still memory-bound
+- batch 1 at S=1024: 1.00 FLOP/byte, memory-bound on
+  any real memory system
+- batch 32 at S=1024: 4.82 FLOP/byte, still far below
+  the ridge point of every accelerator in the table above
+
+Whether batch-32 decode crosses a *particular* machine's ridge is
+machine-dependent and deliberately not asserted here: on a host with
+weak GEMM throughput the ridge can fall below this intensity, which
+says more about that host's compute roof than about decode. The CI
+runner is exactly such a host, which is how this was found.
 
 The gain is larger at short context, where weight traffic dominates,
 and shrinks as the cache grows. That is the tradeoff continuous
