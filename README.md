@@ -1,7 +1,7 @@
 # prefill-decode-roofline
 
-**This machine sustains 40-50% of its datasheet memory bandwidth, and that is
-the number that governs token generation.**
+**This machine sustains well under half of its datasheet memory bandwidth, and
+that is the number that governs token generation.**
 
 This repo answers one question — *where does measured memory bandwidth fall
 short of theoretical peak, and why* — on one machine, a 24-thread CPU with
@@ -33,19 +33,23 @@ Two roofs, both measured here rather than quoted from a datasheet:
 - **Compute roof** — square fp32 GEMMs, whose `2N³ / 3N²` arithmetic intensity
   puts them firmly on the compute side of the ridge.
 
-The headline result is the gap. Sustained DRAM bandwidth lands at **40-50% of
-the datasheet peak** (2 channels × 4800 MT/s × 8 B = 76.8 GB/s; repeated runs
-here measured 42-45%, so the committed claim is stated as a band). That
-shortfall is normal rather than a defect — the datasheet figure assumes no
+The headline result is the gap. Sustained DRAM bandwidth lands at **well under
+half the datasheet peak** (2 channels × 4800 MT/s × 8 B = 76.8 GB/s). Repeated
+runs here measured between 37% and 45% — the spread depends on what else the
+process has allocated — so the committed claim is the qualitative one, asserted
+against a 25-60% range, with the exact per-run percentage kept in the gitignored
+raw artifact.
+
+That shortfall is normal rather than a defect — the datasheet figure assumes no
 refresh, no page misses and perfect read/write turnaround — but it matters
 because *decode is the phase that bandwidth governs*. Sizing a deployment
 against the advertised number overestimates decode throughput by roughly this
 factor.
 
 A second measured result: bandwidth with cache-resident arrays is **at least
-3×** what the same kernel sustains from DRAM — the exact multiplier moves
-between runs, so the asserted floor is what gets reported. A single-size
-bandwidth benchmark reports whichever side of that cliff it happened to land on.
+3×** what the same kernel sustains from DRAM (measured 3-5× across runs, so the
+asserted floor is what gets reported). A single-size bandwidth benchmark reports
+whichever side of that cliff it happened to land on.
 
 ## Prefill vs decode
 

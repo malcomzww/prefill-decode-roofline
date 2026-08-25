@@ -27,9 +27,9 @@ for every two-byte weight, an arithmetic intensity of ~1 by construction.
 
 Two measured facts from this machine sharpen the point:
 
-1. Sustained DRAM bandwidth reaches roughly **40-45% of datasheet peak**. The
-   resource that governs decode is the one whose advertised figure is furthest
-   from what you actually get.
+1. Sustained DRAM bandwidth reaches **well under half of datasheet peak**
+   (37-45% across runs on this machine). The resource that governs decode is
+   the one whose advertised figure is furthest from what you actually get.
 2. The measured ridge point is ~25-26 FLOP/byte, so decode is capped at a few
    percent of the machine's peak FLOP/s. The arithmetic units sit idle waiting
    for weights no matter how good the kernel is.
