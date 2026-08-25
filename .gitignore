@@ -11,3 +11,6 @@ build/
 .env.*
 !.env.example
 .DS_Store
+
+# Machine-specific absolute numbers; the committed claims live in roofline.md
+results/roofline-raw.md

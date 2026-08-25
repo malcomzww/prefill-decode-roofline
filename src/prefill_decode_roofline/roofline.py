@@ -96,9 +96,9 @@ def plot(
         ax.annotate(
             f"{p.phase} S={p.seq_len}",
             xy=(x, y),
-            xytext=(0, -16 if p.phase == "decode" else 10),
+            xytext=(12, -4 if p.phase == "decode" else 10),
             textcoords="offset points",
-            ha="center",
+            ha="left" if p.phase == "decode" else "center",
             fontsize=8,
             color=colour,
         )
@@ -113,14 +113,14 @@ def plot(
     ax.axvspan(left, roof.ridge, color="#b0451c", alpha=0.05)
     ax.text(
         left * 1.5,
-        roof.peak_flops_per_s / 1e9 * 0.02,
+        roof.peak_flops_per_s / 1e9 * 0.006,
         "memory-bandwidth-bound",
         fontsize=8,
         color="#b0451c",
     )
     ax.text(
         roof.ridge * 2.2,
-        roof.peak_flops_per_s / 1e9 * 0.02,
+        roof.peak_flops_per_s / 1e9 * 0.006,
         "compute-bound",
         fontsize=8,
         color="#1a7f4b",
