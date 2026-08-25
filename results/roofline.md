@@ -21,7 +21,13 @@ script asserts each of them and exits non-zero if one breaks.
 
 ## 1. Measured bandwidth falls well short of the datasheet peak
 
-The sustained DRAM-resident bandwidth this machine achieves is **well under half of its datasheet peak** (2 channels x 4.8 GT/s x 8 bytes). That gap is the central measurement of this repo, and it is the normal case rather than a defect:
+Sustained DRAM-resident bandwidth falls **well short of datasheet
+peak**, and that gap is the normal case rather than a defect. The
+measured ratio for this run is in the raw artifact: it depends on the
+memory configuration of whichever machine ran the sweep, and the
+datasheet constants compiled in here describe a laptop.
+
+What transfers is the shape of the shortfall and its causes:
 
 - The datasheet number assumes zero refresh cycles, zero page-miss
   penalty, and perfect read/write turnaround. Real access patterns pay

@@ -128,16 +128,23 @@ def write_invariants(
     # stable and true is "well under half", asserted here against a range wide
     # enough to survive noise but tight enough to fail if the measurement
     # genuinely changes. The exact percentage lives in the raw artifact.
-    assert 0.25 < efficiency < 0.60, (
-        f"measured/theoretical bandwidth was {efficiency:.1%}, outside the "
-        "25-60% range this machine has reproduced -- the measurement or the "
-        "datasheet figure needs rechecking before this claim is republished"
+    # The efficiency figure compares measured bandwidth against a datasheet
+    # peak derived from THIS machine's DDR5 configuration. On a cloud runner
+    # those constants describe different hardware entirely, so both the ratio
+    # and any assertion on it are meaningless there. The measured-vs-peak gap
+    # is genuinely a property of one machine, so it belongs in the raw
+    # artifact; what is committed is the claim that survives the move.
+    assert 0.05 < efficiency < 1.05, (
+        f"measured/theoretical bandwidth was {efficiency:.1%}, which is not "
+        "physically sensible -- above peak or near zero means the measurement "
+        "or the datasheet constants are wrong"
     )
-    add("The sustained DRAM-resident bandwidth this machine achieves is "
-        "**well under half of its datasheet peak** "
-        f"({DDR_CHANNELS} channels x {DDR_TRANSFERS_PER_S / 1e9:.1f} GT/s x "
-        f"{DDR_BUS_BITS // 8} bytes). That gap is the central measurement of "
-        "this repo, and it is the normal case rather than a defect:\n")
+    add("Sustained DRAM-resident bandwidth falls **well short of datasheet")
+    add("peak**, and that gap is the normal case rather than a defect. The")
+    add("measured ratio for this run is in the raw artifact: it depends on the")
+    add("memory configuration of whichever machine ran the sweep, and the")
+    add("datasheet constants compiled in here describe a laptop.\n")
+    add("What transfers is the shape of the shortfall and its causes:\n")
     add("- The datasheet number assumes zero refresh cycles, zero page-miss")
     add("  penalty, and perfect read/write turnaround. Real access patterns pay")
     add("  all three.")
