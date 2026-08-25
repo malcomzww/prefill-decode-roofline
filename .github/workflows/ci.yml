@@ -32,10 +32,17 @@ jobs:
       # The portfolio's signature check: every number in the README is
       # generated, so a hand-edited result fails the build rather than
       # silently drifting from the code that produced it.
+      #
+      # Only the markdown is gated. results/roofline.png encodes measured
+      # values in its pixels, so it differs on every run and on every machine
+      # by construction -- byte-comparing it would fail the build for a reason
+      # that says nothing about correctness. The claims in roofline.md are
+      # stated as asserted bands precisely so that they *are* byte-stable,
+      # which is what makes this gate meaningful.
       - name: Verify generated results are current
         run: |
           if [ -f scripts/generate_results.py ]; then
             uv run python scripts/generate_results.py
-            git diff --exit-code results/ \
-              || (echo "results/ is stale -- regenerate and commit" && exit 1)
+            git diff --exit-code results/roofline.md \
+              || (echo "results/roofline.md is stale -- regenerate and commit" && exit 1)
           fi

@@ -18,7 +18,9 @@ ridge point. Those are the claims worth committing, and this script asserts
 every one of them and exits non-zero if any breaks.
 
 The plot is committed too, since a PNG of the measured roofline is the artifact
-the repo exists to produce. It is regenerated here rather than drawn by hand.
+the repo exists to produce. It is regenerated here rather than drawn by hand,
+but it is deliberately *not* part of the drift gate: its pixels encode measured
+values, so it differs on every run by construction.
 
 Run:  python scripts/generate_results.py
 """
