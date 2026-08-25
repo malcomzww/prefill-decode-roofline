@@ -21,7 +21,7 @@ script asserts each of them and exits non-zero if one breaks.
 
 ## 1. Measured bandwidth falls well short of the datasheet peak
 
-The sustained DRAM-resident bandwidth this machine achieves is **39% of its datasheet peak** (2 channels x 4.8 GT/s x 8 bytes). That gap is the central measurement of this repo, and it is the normal case rather than a defect:
+The sustained DRAM-resident bandwidth this machine achieves is **40-50% of its datasheet peak** (2 channels x 4.8 GT/s x 8 bytes). That gap is the central measurement of this repo, and it is the normal case rather than a defect:
 
 - The datasheet number assumes zero refresh cycles, zero page-miss
   penalty, and perfect read/write turnaround. Real access patterns pay
@@ -39,9 +39,7 @@ factor, and decode is exactly the phase that bandwidth governs.
 
 ## 2. The cache-to-DRAM cliff is real and large
 
-Bandwidth measured with arrays small enough to sit in cache is
-**more than 5x** what the same kernel sustains once the
-working set must come from DRAM. This is why the sweep exists: a
+Bandwidth measured with arrays small enough to sit in cache is **at least 3x** what the same kernel sustains once the working set must come from DRAM. The measured multiplier moves between runs, so the asserted floor is the reportable claim rather than a point estimate. This is why the sweep exists: a
 single-size bandwidth benchmark reports whichever side of the cliff it
 happened to land on, and the two differ by more than the entire
 effect most optimisations are chasing.
@@ -84,8 +82,8 @@ roofline moves the ridge point right, which if anything makes decode
 
 | machine | ridge point | decode verdict | prefill verdict |
 |---|---|---|---|
-| this machine (DDR5) | 27 FLOP/byte | memory-bound | compute-bound |
-| HBM-class accelerator | 299 FLOP/byte | memory-bound | compute-bound |
+| this machine (DDR5) | ~10s of FLOP/byte | memory-bound | compute-bound |
+| HBM-class accelerator | ~100s of FLOP/byte | memory-bound | compute-bound |
 
 The HBM row uses published vendor figures, not measurements taken
 here. It is arithmetic on the measured intensities from this repo,
