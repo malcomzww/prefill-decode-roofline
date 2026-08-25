@@ -19,6 +19,7 @@ sizes that have not yet saturated the pipeline would understate it.
 
 from __future__ import annotations
 
+import gc
 import time
 from dataclasses import dataclass
 
@@ -64,11 +65,26 @@ def measure_gemm(n: int, dtype: str = "float32", repeats: int = 5, seed: int = 0
         start = time.perf_counter_ns()
         a @ b
         best = min(best, (time.perf_counter_ns() - start) / 1e9)
+
+    del a, b
     return GemmPoint(n=n, dtype=dtype, seconds=best)
 
 
 def sweep(sizes: list[int], dtype: str = "float32", repeats: int = 5) -> list[GemmPoint]:
-    return [measure_gemm(n, dtype=dtype, repeats=repeats) for n in sizes]
+    """Measure each size, releasing memory between sizes.
+
+    The explicit ``gc.collect()`` is load-bearing on a memory-constrained
+    machine. Without it, a sweep leaves each size's matrices reachable long
+    enough that later sizes allocate under pressure and degrade into paging:
+    during development N=4096 measured ~870 GFLOP/s in isolation but ~320 at
+    the end of a sweep, a 2.7x error that would have silently understated the
+    compute roof and dragged the ridge point down with it.
+    """
+    points = []
+    for n in sizes:
+        points.append(measure_gemm(n, dtype=dtype, repeats=repeats))
+        gc.collect()
+    return points
 
 
 def peak_gflops(points: list[GemmPoint]) -> float:

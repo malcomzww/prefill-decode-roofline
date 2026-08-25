@@ -32,6 +32,7 @@ shared laptop the mean measures the rest of the system as much as the kernel.
 
 from __future__ import annotations
 
+import gc
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -115,12 +116,13 @@ def measure_kernel(kernel: str, array_bytes: int, repeats: int = 7) -> Bandwidth
             return np.add(b, scratch, out=a)
 
     seconds = _time_min(fn, repeats=repeats)
-    return BandwidthPoint(
+    point = BandwidthPoint(
         kernel=kernel,
         array_bytes=n * BYTES_PER_F64,
         traffic_bytes=KERNEL_TRAFFIC[kernel] * n * BYTES_PER_F64,
         seconds=seconds,
     )
+    return point
 
 
 def sweep(
@@ -128,10 +130,20 @@ def sweep(
     kernels: tuple[str, ...] = ("copy", "scale", "add", "triad"),
     repeats: int = 7,
 ) -> list[BandwidthPoint]:
-    """Measure every kernel at every size."""
-    return [
-        measure_kernel(k, size, repeats=repeats) for size in array_bytes_list for k in kernels
-    ]
+    """Measure every kernel at every size, releasing arrays between points.
+
+    The ``gc.collect()`` matters at the large end of the sweep. Each kernel
+    holds up to three arrays live, so at 256 MB per array a point has a 768 MB
+    footprint; letting consecutive points overlap pushes a memory-constrained
+    machine into paging, and what gets measured then is the OS pager rather
+    than the memory controller.
+    """
+    points = []
+    for size in array_bytes_list:
+        for k in kernels:
+            points.append(measure_kernel(k, size, repeats=repeats))
+        gc.collect()
+    return points
 
 
 def sustained_bandwidth(points: list[BandwidthPoint], min_array_bytes: int) -> float:
