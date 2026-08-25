@@ -21,7 +21,7 @@ script asserts each of them and exits non-zero if one breaks.
 
 ## 1. Measured bandwidth falls well short of the datasheet peak
 
-The sustained DRAM-resident bandwidth this machine achieves is **40-50% of its datasheet peak** (2 channels x 4.8 GT/s x 8 bytes). That gap is the central measurement of this repo, and it is the normal case rather than a defect:
+The sustained DRAM-resident bandwidth this machine achieves is **well under half of its datasheet peak** (2 channels x 4.8 GT/s x 8 bytes). That gap is the central measurement of this repo, and it is the normal case rather than a defect:
 
 - The datasheet number assumes zero refresh cycles, zero page-miss
   penalty, and perfect read/write turnaround. Real access patterns pay

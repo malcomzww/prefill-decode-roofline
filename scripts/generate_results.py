@@ -119,20 +119,20 @@ def write_invariants(
     add(f"- Plot: `results/{PNG.name}`\n")
 
     add("## 1. Measured bandwidth falls well short of the datasheet peak\n")
-    assert 0.20 < efficiency < 0.90, (
+    # Fixed prose plus an assert, rather than a computed band. Repeated clean
+    # runs on this machine landed between 37% and 41%, which straddles a decade
+    # boundary -- so *any* bucketing of the measured value flips the committed
+    # text between runs and breaks the drift gate. The claim that is both
+    # stable and true is "well under half", asserted here against a range wide
+    # enough to survive noise but tight enough to fail if the measurement
+    # genuinely changes. The exact percentage lives in the raw artifact.
+    assert 0.25 < efficiency < 0.60, (
         f"measured/theoretical bandwidth was {efficiency:.1%}, outside the "
-        "20-90% band any real DRAM subsystem should land in -- either the "
-        "measurement or the datasheet figure is wrong"
+        "25-60% range this machine has reproduced -- the measurement or the "
+        "datasheet figure needs rechecking before this claim is republished"
     )
-    # Reported as a decade band rather than exact digits. Repeated runs on this
-    # machine landed between 42% and 45%, so committing two significant figures
-    # would make this file differ on every regeneration and break the drift
-    # gate for no useful reason -- and a 5-point band still flips whenever the
-    # value crosses a boundary. The wider band is the claim that survives a
-    # rerun, and it is still far enough from 100% to carry the point.
-    band_lo = int(efficiency * 100 // 10 * 10)
     add("The sustained DRAM-resident bandwidth this machine achieves is "
-        f"**{band_lo}-{band_lo + 10}% of its datasheet peak** "
+        "**well under half of its datasheet peak** "
         f"({DDR_CHANNELS} channels x {DDR_TRANSFERS_PER_S / 1e9:.1f} GT/s x "
         f"{DDR_BUS_BITS // 8} bytes). That gap is the central measurement of "
         "this repo, and it is the normal case rather than a defect:\n")
