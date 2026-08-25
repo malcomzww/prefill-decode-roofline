@@ -73,10 +73,16 @@ construction -- no memory system has a ridge point that low.
 
 ## 4. Decode cannot use most of the arithmetic on the machine
 
-The roofline caps decode at **under 5%** of the measured peak FLOP/s
-on this machine. That is not a kernel-quality problem and no amount of
-optimisation fixes it: the point sits on the bandwidth roof, so the
-arithmetic units are idle waiting for weights either way.
+The roofline caps decode at **a small fraction** of peak FLOP/s -- the
+exact fraction depends on the machine's compute-to-bandwidth ratio and
+is in the raw artifact, not committed here. That is not a
+kernel-quality problem and no amount of optimisation fixes it: the
+point sits on the bandwidth roof, so the arithmetic units are idle
+waiting for weights either way.
+
+The direction is what transfers. A machine with a *weaker* compute
+roof shows a higher percentage without decode becoming any less
+memory-bound -- the ratio moved, not the physics.
 
 This is the argument against tokens/sec as a headline metric --
 see `docs/adr/0001-why-tokens-per-second-is-the-wrong-headline.md`.

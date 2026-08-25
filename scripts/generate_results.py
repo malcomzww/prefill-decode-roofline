@@ -199,12 +199,25 @@ def write_invariants(
 
     add("## 4. Decode cannot use most of the arithmetic on the machine\n")
     util = roof.utilisation(dec)
-    assert util < 0.25, f"decode could reach {util:.1%} of the compute roof -- expected a few %"
-    band = "under 5%" if util < 0.05 else "under 25%"
-    add(f"The roofline caps decode at **{band}** of the measured peak FLOP/s")
-    add("on this machine. That is not a kernel-quality problem and no amount of")
-    add("optimisation fixes it: the point sits on the bandwidth roof, so the")
-    add("arithmetic units are idle waiting for weights either way.\n")
+    # The exact fraction is a property of this machine's compute-to-bandwidth
+    # ratio: ~2% on a laptop with a strong GEMM roof, ~20% on a CI runner whose
+    # GEMM roof is far lower. Bucketing it into prose still commits a
+    # machine-dependent number, which is what broke the drift gate. Assert the
+    # portable bound and put the run's own figure in the raw artifact.
+    assert util < 0.25, (
+        f"decode could reach {util:.1%} of the compute roof -- above 25% would "
+        "mean the machine is so bandwidth-rich that decode is no longer "
+        "memory-bound, which contradicts the intensity arithmetic above"
+    )
+    add("The roofline caps decode at **a small fraction** of peak FLOP/s -- the")
+    add("exact fraction depends on the machine's compute-to-bandwidth ratio and")
+    add("is in the raw artifact, not committed here. That is not a")
+    add("kernel-quality problem and no amount of optimisation fixes it: the")
+    add("point sits on the bandwidth roof, so the arithmetic units are idle")
+    add("waiting for weights either way.\n")
+    add("The direction is what transfers. A machine with a *weaker* compute")
+    add("roof shows a higher percentage without decode becoming any less")
+    add("memory-bound -- the ratio moved, not the physics.\n")
     add("This is the argument against tokens/sec as a headline metric --")
     add("see `docs/adr/0001-why-tokens-per-second-is-the-wrong-headline.md`.\n")
 
