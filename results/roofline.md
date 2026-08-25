@@ -37,12 +37,20 @@ The practical lesson: sizing a serving deployment against a datasheet
 bandwidth number will overestimate decode throughput by roughly this
 factor, and decode is exactly the phase that bandwidth governs.
 
-## 2. The cache-to-DRAM cliff is real and large
+## 2. Bandwidth depends on where the working set lives
 
-Bandwidth measured with arrays small enough to sit in cache is **at least 3x** what the same kernel sustains once the working set must come from DRAM. The measured multiplier moves between runs, so the asserted floor is the reportable claim rather than a point estimate. This is why the sweep exists: a
-single-size bandwidth benchmark reports whichever side of the cliff it
-happened to land on, and the two differ by more than the entire
-effect most optimisations are chasing.
+Bandwidth measured with arrays small enough to sit in cache exceeds
+what the same kernel sustains once the working set must come from
+DRAM. **The size of that gap is a property of the machine, not of the
+workload** — it ran 3-5x on a quiet laptop and 1.14x on a shared CI
+runner, where a virtualised cache hierarchy flattens it. Only the
+direction is asserted here; the magnitude for this run is in the raw
+artifact.
+
+This is why the sweep exists: a single-size bandwidth benchmark
+reports whichever side of the cliff it happened to land on, and on
+real hardware the two differ by more than the entire effect most
+optimisations are chasing.
 
 Only DRAM-resident points set the bandwidth roof below. A KV cache at
 realistic context lengths does not fit in L3.

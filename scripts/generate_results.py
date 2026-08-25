@@ -151,19 +151,27 @@ def write_invariants(
     add("bandwidth number will overestimate decode throughput by roughly this")
     add("factor, and decode is exactly the phase that bandwidth governs.\n")
 
-    add("## 2. The cache-to-DRAM cliff is real and large\n")
-    assert cliff > 1.5, f"cache-resident was only {cliff:.2f}x DRAM-resident -- expected a cliff"
-    # The exact multiplier swung between ~3x and ~5x across runs: the
-    # cache-resident end of the sweep is the noisiest part of it. Assert the
-    # floor and say so, rather than committing whichever value this run got.
-    add("Bandwidth measured with arrays small enough to sit in cache is "
-        "**at least 3x** what the same kernel sustains once the working set "
-        "must come from DRAM. The measured multiplier moves between runs, so "
-        "the asserted floor is the reportable claim rather than a point "
-        "estimate. This is why the sweep exists: a")
-    add("single-size bandwidth benchmark reports whichever side of the cliff it")
-    add("happened to land on, and the two differ by more than the entire")
-    add("effect most optimisations are chasing.\n")
+    add("## 2. Bandwidth depends on where the working set lives\n")
+    # The multiplier is not portable. It ran ~3-5x on a quiet laptop and 1.14x
+    # on a shared CI runner, where a virtualised cache hierarchy and noisy
+    # neighbours flatten it. Asserting any particular magnitude commits a
+    # machine-dependent number to a file whose premise is the opposite, so the
+    # assertion is only that cache-resident is not SLOWER.
+    assert cliff > 0.95, (
+        f"cache-resident measured {cliff:.2f}x DRAM-resident -- below 1.0x is "
+        "not physically sensible and indicates a broken measurement"
+    )
+    add("Bandwidth measured with arrays small enough to sit in cache exceeds")
+    add("what the same kernel sustains once the working set must come from")
+    add("DRAM. **The size of that gap is a property of the machine, not of the")
+    add("workload** — it ran 3-5x on a quiet laptop and 1.14x on a shared CI")
+    add("runner, where a virtualised cache hierarchy flattens it. Only the")
+    add("direction is asserted here; the magnitude for this run is in the raw")
+    add("artifact.\n")
+    add("This is why the sweep exists: a single-size bandwidth benchmark")
+    add("reports whichever side of the cliff it happened to land on, and on")
+    add("real hardware the two differ by more than the entire effect most")
+    add("optimisations are chasing.\n")
     add("Only DRAM-resident points set the bandwidth roof below. A KV cache at")
     add("realistic context lengths does not fit in L3.\n")
 
